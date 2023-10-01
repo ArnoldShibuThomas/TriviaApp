@@ -2,11 +2,13 @@ package com.arnold.triviaapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     // get the search bar
     private EditText searchBar;
     // create a hash map
-    private HashMap<Integer,String> items = new HashMap<Integer,String>();
+    private HashMap<String,Integer> items = new HashMap<String,Integer>();
     // This will store the finalize list
     private ArrayList<String> searchableList= new ArrayList<>();
 
@@ -57,28 +59,34 @@ public class MainActivity extends AppCompatActivity {
         categories.setAdapter(adapter);
         // get all of the categories
         getCategories(adapter);
+        // create a Text-watcher on the search bard
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // if the user types in something search for what they typed
                 if (s.toString().trim().length() != 0) {
                     searchForWord(s.toString(), adapter);
                 }
                 else{
+                    // If the user makes the the search empty bring back everything
                     refresh(adapter);
                 }
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // if the user types in something search for what they typed
                 searchForWord(s.toString().trim(), adapter);
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+                // if the user types in something search for what they typed
                 if (s.toString().trim().length() != 0) {
                     searchForWord(s.toString().trim(), adapter);
                 }
                 else{
+                    // If the user makes the the search empty bring back everything
                     refresh(adapter);
                 }
             }
@@ -87,18 +95,38 @@ public class MainActivity extends AppCompatActivity {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // clear the search
                 searchBar.getText().clear();
+                // refresh the list of items to have everything again
                 refresh(adapter);
 
             }
         });
+        //handle the click events in the list view
+        categories.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // go to the question page with the id of the selected option
+                int idOfCategory = items.get(categoriesFound.get(position));
+                // create a new intent
+                Intent intent = new Intent(MainActivity.this,Questions.class);
+                // give the new intent the id the user has chosen as a string
+                intent.putExtra("id","" + idOfCategory);
+                // start the new activity
+                startActivity(intent);
+            }
+        });
     }
 
+    // This is the refresh method which will reset the list view to all the list items
     private void refresh(ArrayAdapter<String> adapter) {
+        // clear the list
         categoriesFound.clear();
+        // insert everything back into list
         for(int i = 0; i <searchableList.size(); i++){
             categoriesFound.add(searchableList.get(i));
         }
+        // notify the adapter of the change
         adapter.notifyDataSetChanged();
     }
 
@@ -106,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
     private void getCategories(ArrayAdapter<String> adapter) {
         // getting a new volley request queue for making new requests
         RequestQueue volleyQueue = Volley.newRequestQueue(MainActivity.this);
-        // url of the api through which we get random dog images
+        // url of the api through which we get the categories
         String url = categoriesApi;
         // clear the list
         categoriesFound.clear();
@@ -117,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                 (Response.Listener<JSONObject>) response -> {
                     try {
                         // clear hashmap
-                        items = new HashMap<Integer,String>();
+                        items = new HashMap<String,Integer>();
                         // lets index all the categories
                         int i = 0;
                         // get the json object
@@ -132,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                             // this will add it to the global list
                             searchableList.add((String) here.get("name"));
                             // Store key values in hashmaps
-                            items.put((Integer) here.get("id"), (String) here.get("name"));
+                            items.put((String) here.get("name"),(Integer) here.get("id"));
                             // increment i
                             i++;
                         }
@@ -146,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
                 (Response.ErrorListener) error -> {
                     // make a Toast telling the user that something went wrong
                     Toast.makeText(MainActivity.this, "Error Occurred during load", Toast.LENGTH_LONG).show();
-
                 }
         );
         // to the Volley request queue
@@ -155,13 +182,15 @@ public class MainActivity extends AppCompatActivity {
 
     // This will be the basis for a simple search
     private  void searchForWord(String wordOrPhrase, ArrayAdapter<String> adapter){
+        // clear the categories found
         categoriesFound.clear();
+        // look for all the categories containing the String the user is searching for
         for(int i = 0; i < searchableList.size(); i++){
             if(searchableList.get(i).contains(wordOrPhrase)){
+                // if the String contains the substring the user is searching for then do this
                 categoriesFound.add(searchableList.get(i));
             }
         }
-        System.out.print(categoriesFound.size());
         // change the data to match
         adapter.notifyDataSetChanged();
     }
