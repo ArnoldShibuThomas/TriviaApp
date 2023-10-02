@@ -3,6 +3,7 @@ package com.arnold.triviaapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +19,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 
 public class Questions extends AppCompatActivity {
     private TextView question;
@@ -27,7 +33,12 @@ public class Questions extends AppCompatActivity {
     private Button b4;
     private TextView status;
     private Button nextQuestion;
+
     private int currentQuestion = 1;
+
+    private String correctAnswer = null;
+
+    private boolean answered = false;
 
     String categoryId;
     private String sessionKey;
@@ -42,6 +53,7 @@ public class Questions extends AppCompatActivity {
         b3 = findViewById(R.id.option3);
         b4 = findViewById(R.id.option4);
         nextQuestion = findViewById(R.id.nextQuestion);
+        nextQuestion.setVisibility(View.INVISIBLE);
         // get the extra passed and set it as the category id
         categoryId = getIntent().getStringExtra("id");
         // check for null
@@ -55,6 +67,32 @@ public class Questions extends AppCompatActivity {
             Toast.makeText(this, "Nothing was given", Toast.LENGTH_SHORT).show();
             finish();
         }
+
+        //create the onClicks for each button
+        b1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                answerQuestion((String) b1.getText());
+            }
+        });
+        b2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                answerQuestion((String) b2.getText());
+            }
+        });
+        b3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                answerQuestion((String) b3.getText());
+            }
+        });
+        b4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                answerQuestion((String) b4.getText());
+            }
+        });
     }
 
     private void getQuestion() {
@@ -84,7 +122,48 @@ public class Questions extends AppCompatActivity {
                             byte[] valueDecoded = Base64.decodeBase64(qsDecoded);
                             // set the text now
                             question.setText(new String(valueDecoded));
-                            // get the questions
+                            // get the questions type and decode it
+                            qsDecoded = (String) questionHere.get("type");
+                            String type = new String(valueDecoded = Base64.decodeBase64(qsDecoded));
+                            // if the question is a multiple choice
+                            if(type.equals("multiple")){
+                                // make the other button visible
+                                b3.setVisibility(View.VISIBLE);
+                                b4.setVisibility(View.VISIBLE);
+                                // get the correct answer
+                                qsDecoded = (String) questionHere.get("correct_answer");
+                                correctAnswer = new String(valueDecoded = Base64.decodeBase64(qsDecoded));
+                               // store all the incorrect answers
+                                ArrayList<String> incorrect_answer = new ArrayList<>();
+                                // add correct answer to list of answers
+                                incorrect_answer.add(correctAnswer);
+                                int counter = 0;
+                                while (questionHere.getJSONArray("incorrect_answers").length() != counter){
+                                    // decode the incorrect
+                                    qsDecoded = (String) questionHere.getJSONArray("incorrect_answers").get(counter);
+                                    // add the incorrect answer
+                                    incorrect_answer.add(new String(valueDecoded = Base64.decodeBase64(qsDecoded)));
+                                    counter++;
+                                }
+                                //shuffle
+                                Collections.shuffle(incorrect_answer);
+                                // add the response to each button
+                                b1.setText(incorrect_answer.get(0));
+                                b2.setText(incorrect_answer.get(1));
+                                b3.setText(incorrect_answer.get(2));
+                                b4.setText(incorrect_answer.get(3));
+                            }
+                            // if the question is a true and false
+                            else{
+                                // only show true and false and make the other buttons disappear
+                                b3.setVisibility(View.INVISIBLE);
+                                b4.setVisibility(View.INVISIBLE);
+                                b1.setText("True");
+                                b2.setText("False");
+                                // get the correct answer and decode it
+                                qsDecoded = (String) questionHere.get("correct_answer");
+                                correctAnswer = new String(valueDecoded = Base64.decodeBase64(qsDecoded));
+                            }
                         }
                         else{
                             Toast.makeText(this, "Session cannot be made", Toast.LENGTH_SHORT).show();
@@ -119,8 +198,6 @@ public class Questions extends AppCompatActivity {
                         if(code == 0){
                             // get the session key
                             sessionKey = (String) response.get("token");
-                            // tell the user that we are good to go
-                            Toast.makeText(this, "Session started..", Toast.LENGTH_SHORT).show();
                         }
                         else{
                             Toast.makeText(this, "Session cannot be made", Toast.LENGTH_SHORT).show();
@@ -137,5 +214,21 @@ public class Questions extends AppCompatActivity {
         );
         // to the Volley request queue
         volleyQueue.add(jsonObjectRequest);
+    }
+
+    private void answerQuestion(String chosen){
+        if(answered == false) {
+            // set the answered Flag to true
+            answered = true;
+            // check to see if answer was correct or incorrect and toast as such
+            if (chosen.equals(correctAnswer)) {
+                Toast.makeText(this, "Correct!", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(this, "Incorrect", Toast.LENGTH_SHORT).show();
+            }
+            // make next question visible
+            nextQuestion.setVisibility(View.VISIBLE);
+        }
     }
 }
