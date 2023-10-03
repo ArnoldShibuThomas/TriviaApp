@@ -2,6 +2,7 @@ package com.arnold.triviaapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -33,13 +34,11 @@ public class Questions extends AppCompatActivity {
     private Button b4;
     private TextView status;
     private Button nextQuestion;
-
+    private int correctlyAnswered = 0;
     private int currentQuestion = 1;
-
     private String correctAnswer = null;
-
     private boolean answered = false;
-
+    private boolean ended = false;
     String categoryId;
     private String sessionKey;
     @Override
@@ -52,6 +51,12 @@ public class Questions extends AppCompatActivity {
         b2 = findViewById(R.id.option2);
         b3 = findViewById(R.id.option3);
         b4 = findViewById(R.id.option4);
+        // set the color of the buttons
+        b1.setBackgroundColor(Color.LTGRAY);
+        b2.setBackgroundColor(Color.LTGRAY);
+        b3.setBackgroundColor(Color.LTGRAY);
+        b4.setBackgroundColor(Color.LTGRAY);
+        status = findViewById(R.id.statusMessage);
         nextQuestion = findViewById(R.id.nextQuestion);
         nextQuestion.setVisibility(View.INVISIBLE);
         // get the extra passed and set it as the category id
@@ -91,6 +96,46 @@ public class Questions extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 answerQuestion((String) b4.getText());
+            }
+        });
+        nextQuestion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // increment the current question
+                currentQuestion++;
+                if(currentQuestion <= 10) {
+                    //set answered back to false
+                    answered = false;
+                    // Change the Header
+                    status.setText("Question " + currentQuestion + " out of 10");
+                    // set next question to invisible
+                    nextQuestion.setVisibility(View.INVISIBLE);
+                    // set the color of the buttons
+                    b1.setBackgroundColor(Color.LTGRAY);
+                    b2.setBackgroundColor(Color.LTGRAY);
+                    b3.setBackgroundColor(Color.LTGRAY);
+                    b4.setBackgroundColor(Color.LTGRAY);
+                    // get a question
+                    getQuestion();
+                }
+                else{
+                    if(ended == false) {
+                        // set every question thing to invisible
+                        question.setVisibility(View.INVISIBLE);
+                        b1.setVisibility(View.INVISIBLE);
+                        b2.setVisibility(View.INVISIBLE);
+                        b3.setVisibility(View.INVISIBLE);
+                        b4.setVisibility(View.INVISIBLE);
+                        status.setVisibility(View.VISIBLE);
+                        status.setText("You answered " + correctlyAnswered + " Questions correctly out of 10!");
+                        nextQuestion.setText("Play again!");
+                        nextQuestion.setVisibility(View.VISIBLE);
+                        ended = true;
+                    }
+                    else{
+                        finish();
+                    }
+                }
             }
         });
     }
@@ -222,10 +267,36 @@ public class Questions extends AppCompatActivity {
             answered = true;
             // check to see if answer was correct or incorrect and toast as such
             if (chosen.equals(correctAnswer)) {
+                correctlyAnswered++;
                 Toast.makeText(this, "Correct!", Toast.LENGTH_SHORT).show();
             }
             else{
                 Toast.makeText(this, "Incorrect", Toast.LENGTH_SHORT).show();
+            }
+            // show correct and wrong answers with colors red-wrong and green-right
+            if(b1.getText().equals(correctAnswer)){
+                b1.setBackgroundColor(Color.GREEN);
+                b2.setBackgroundColor(Color.RED);
+                b3.setBackgroundColor(Color.RED);
+                b4.setBackgroundColor(Color.RED);
+            }
+            else if(b2.getText().equals(correctAnswer)){
+                b1.setBackgroundColor(Color.RED);
+                b2.setBackgroundColor(Color.GREEN);
+                b3.setBackgroundColor(Color.RED);
+                b4.setBackgroundColor(Color.RED);
+            }
+            else if(b3.getText().equals(correctAnswer)){
+                b1.setBackgroundColor(Color.RED);
+                b2.setBackgroundColor(Color.RED);
+                b3.setBackgroundColor(Color.GREEN);
+                b4.setBackgroundColor(Color.RED);
+            }
+            else{
+                b1.setBackgroundColor(Color.RED);
+                b2.setBackgroundColor(Color.RED);
+                b3.setBackgroundColor(Color.RED);
+                b4.setBackgroundColor(Color.GREEN);
             }
             // make next question visible
             nextQuestion.setVisibility(View.VISIBLE);

@@ -12,7 +12,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView8"
+            android:id="@+id/statusMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -33,6 +33,7 @@
             android:id="@+id/option1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center|center_horizontal|center_vertical"
             android:padding="8dp"
             android:text="Button" />
 
@@ -40,6 +41,7 @@
             android:id="@+id/option2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:padding="8dp"
             android:text="Button" />
 
@@ -47,6 +49,7 @@
             android:id="@+id/option3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:padding="8dp"
             android:text="Button" />
 
@@ -54,6 +57,7 @@
             android:id="@+id/option4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:padding="8dp"
             android:text="Button" />
 
@@ -61,8 +65,8 @@
             android:id="@+id/nextQuestion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="300dp"
-            android:layout_marginTop="200dp"
+            android:layout_marginStart="250dp"
+            android:layout_marginTop="150dp"
             android:padding="8dp"
             android:text="Next" />
     </LinearLayout>
