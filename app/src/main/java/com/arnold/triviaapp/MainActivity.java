@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -44,10 +45,14 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<String> categoriesFound;
 
+    private final LoadingDialog loadingDialog = new LoadingDialog(MainActivity.this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // start loading
+        loadingDialog.startLoadingDialog();
         // initialize variables
         categories = findViewById(R.id.categories);
         refresh = findViewById(R.id.refreshButton);
@@ -59,6 +64,13 @@ public class MainActivity extends AppCompatActivity {
         categories.setAdapter(adapter);
         // get all of the categories
         getCategories(adapter);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadingDialog.dismissDialog();
+            }
+        }, 500);
         // create a Text-watcher on the search bard
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
@@ -95,11 +107,20 @@ public class MainActivity extends AppCompatActivity {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // start loading
+                loadingDialog.startLoadingDialog();
                 // clear the search
                 searchBar.getText().clear();
                 // refresh the list of items to have everything again
                 refresh(adapter);
-
+                // make user wait
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadingDialog.dismissDialog();
+                    }
+                }, 500);
             }
         });
         //handle the click events in the list view

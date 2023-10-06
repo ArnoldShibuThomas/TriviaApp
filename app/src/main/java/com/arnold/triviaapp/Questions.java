@@ -2,8 +2,10 @@ package com.arnold.triviaapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -16,14 +18,11 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.codec.binary.Base64;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 
 public class Questions extends AppCompatActivity {
@@ -41,10 +40,14 @@ public class Questions extends AppCompatActivity {
     private boolean ended = false;
     String categoryId;
     private String sessionKey;
+
+    private final LoadingDialog loadingDialog = new LoadingDialog(Questions.this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_questions);
+        // start loading
+        loadingDialog.startLoadingDialog();
         // instantiate the variable
         question = findViewById(R.id.question);
         b1 = findViewById(R.id.option1);
@@ -72,7 +75,17 @@ public class Questions extends AppCompatActivity {
             Toast.makeText(this, "Nothing was given", Toast.LENGTH_SHORT).show();
             finish();
         }
-
+        // create a status message
+        status.setText("Question "+ currentQuestion +" out of 10");
+        // create a handler
+        Handler handler = new Handler();
+        // Delay
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadingDialog.dismissDialog();
+            }
+        }, 500);
         //create the onClicks for each button
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +117,8 @@ public class Questions extends AppCompatActivity {
                 // increment the current question
                 currentQuestion++;
                 if(currentQuestion <= 10) {
+                    // start loading
+                    loadingDialog.startLoadingDialog();
                     //set answered back to false
                     answered = false;
                     // Change the Header
@@ -117,9 +132,20 @@ public class Questions extends AppCompatActivity {
                     b4.setBackgroundColor(Color.LTGRAY);
                     // get a question
                     getQuestion();
+                    // create a handler
+                    Handler handler = new Handler();
+                    // Delay
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadingDialog.dismissDialog();
+                        }
+                    }, 500);
                 }
                 else{
                     if(ended == false) {
+                        // start loading
+                        loadingDialog.startLoadingDialog();
                         // set every question thing to invisible
                         question.setVisibility(View.INVISIBLE);
                         b1.setVisibility(View.INVISIBLE);
@@ -131,6 +157,15 @@ public class Questions extends AppCompatActivity {
                         nextQuestion.setText("Play again!");
                         nextQuestion.setVisibility(View.VISIBLE);
                         ended = true;
+                        // create a handler
+                        Handler handler = new Handler();
+                        // Delay
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingDialog.dismissDialog();
+                            }
+                        }, 500);
                     }
                     else{
                         finish();
