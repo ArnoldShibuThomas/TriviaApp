@@ -64,13 +64,6 @@ public class MainActivity extends AppCompatActivity {
         categories.setAdapter(adapter);
         // get all of the categories
         getCategories(adapter);
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadingDialog.dismissDialog();
-            }
-        }, 500);
         // create a Text-watcher on the search bard
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
@@ -137,6 +130,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        // create a delay
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadingDialog.dismissDialog();
+            }
+        }, 500);
     }
 
     // This is the refresh method which will reset the list view to all the list items
@@ -207,7 +208,10 @@ public class MainActivity extends AppCompatActivity {
         categoriesFound.clear();
         // look for all the categories containing the String the user is searching for
         for(int i = 0; i < searchableList.size(); i++){
-            if(searchableList.get(i).contains(wordOrPhrase)){
+            // avoid spaces and caps
+            String listItem = searchableList.get(i).toLowerCase().replaceAll("\\s", "");
+            wordOrPhrase = wordOrPhrase.toLowerCase().replaceAll("\\s", "");
+            if(listItem.contains(wordOrPhrase)){
                 // if the String contains the substring the user is searching for then do this
                 categoriesFound.add(searchableList.get(i));
             }

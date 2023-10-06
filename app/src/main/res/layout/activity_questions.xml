@@ -29,6 +29,16 @@
             android:text="Loading.."
             android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
+        <pl.droidsonroids.gif.GifImageView
+            android:id="@+id/feedback"
+            android:layout_width="371dp"
+            android:layout_height="251dp"
+            android:layout_gravity="center"
+            android:padding="8dp"
+            android:src="@drawable/lose"
+            android:visibility="gone"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
         <Button
             android:id="@+id/option1"
             android:layout_width="match_parent"
@@ -85,18 +95,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.936" />
 
-            <pl.droidsonroids.gif.GifImageView
-                android:id="@+id/feedback"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/lose"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toTopOf="@+id/nextQuestion"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.557"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:srcCompat="@tools:sample/backgrounds/scenic" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>

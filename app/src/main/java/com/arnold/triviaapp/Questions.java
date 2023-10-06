@@ -48,9 +48,14 @@ public class Questions extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_questions);
         // start loading
         loadingDialog.startLoadingDialog();
+        // set context
+        setContentView(R.layout.activity_questions);
+        // generate a session key for the user
+        generateSessionKey();
+        // get the extra passed and set it as the category id
+        categoryId = getIntent().getStringExtra("id");
         // get the image
         feedbackImage = findViewById(R.id.feedback);
         // instantiate the variable
@@ -67,12 +72,8 @@ public class Questions extends AppCompatActivity {
         status = findViewById(R.id.statusMessage);
         nextQuestion = findViewById(R.id.nextQuestion);
         nextQuestion.setVisibility(View.INVISIBLE);
-        // get the extra passed and set it as the category id
-        categoryId = getIntent().getStringExtra("id");
         // check for null
         if(categoryId != null){
-            // generate a session key for the user
-            generateSessionKey();
             // get a question
             getQuestion();
         }
@@ -82,15 +83,6 @@ public class Questions extends AppCompatActivity {
         }
         // create a status message
         status.setText("Question "+ currentQuestion +" out of 10");
-        // create a handler
-        Handler handler = new Handler();
-        // Delay
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadingDialog.dismissDialog();
-            }
-        }, 500);
         //create the onClicks for each button
         b1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,11 +144,11 @@ public class Questions extends AppCompatActivity {
                         // start loading
                         loadingDialog.startLoadingDialog();
                         // set every question thing to invisible
-                        question.setVisibility(View.INVISIBLE);
-                        b1.setVisibility(View.INVISIBLE);
-                        b2.setVisibility(View.INVISIBLE);
-                        b3.setVisibility(View.INVISIBLE);
-                        b4.setVisibility(View.INVISIBLE);
+                        question.setVisibility(View.GONE);
+                        b1.setVisibility(View.GONE);
+                        b2.setVisibility(View.GONE);
+                        b3.setVisibility(View.GONE);
+                        b4.setVisibility(View.GONE);
                         status.setVisibility(View.VISIBLE);
                         status.setText("You answered " + correctlyAnswered + " Questions correctly out of 10!");
                         nextQuestion.setText("Play again!");
@@ -186,6 +178,15 @@ public class Questions extends AppCompatActivity {
                 }
             }
         });
+        // create a handler
+        Handler handler = new Handler();
+        // Delay
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadingDialog.dismissDialog();
+            }
+        }, 600);
     }
 
     private void getQuestion() {
