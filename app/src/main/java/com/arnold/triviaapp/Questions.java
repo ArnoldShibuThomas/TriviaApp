@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
+import pl.droidsonroids.gif.GifImageView;
 
 
 public class Questions extends AppCompatActivity {
@@ -40,7 +43,7 @@ public class Questions extends AppCompatActivity {
     private boolean ended = false;
     String categoryId;
     private String sessionKey;
-
+    private GifImageView feedbackImage;
     private final LoadingDialog loadingDialog = new LoadingDialog(Questions.this);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,8 @@ public class Questions extends AppCompatActivity {
         setContentView(R.layout.activity_questions);
         // start loading
         loadingDialog.startLoadingDialog();
+        // get the image
+        feedbackImage = findViewById(R.id.feedback);
         // instantiate the variable
         question = findViewById(R.id.question);
         b1 = findViewById(R.id.option1);
@@ -157,6 +162,14 @@ public class Questions extends AppCompatActivity {
                         nextQuestion.setText("Play again!");
                         nextQuestion.setVisibility(View.VISIBLE);
                         ended = true;
+                        // set the image view to visible
+                        feedbackImage.setVisibility(View.VISIBLE);
+                        if(correctlyAnswered <= 7){
+                            feedbackImage.setImageResource(R.drawable.lose);
+                        }
+                        else{
+                            feedbackImage.setImageResource(R.drawable.win);
+                        }
                         // create a handler
                         Handler handler = new Handler();
                         // Delay
