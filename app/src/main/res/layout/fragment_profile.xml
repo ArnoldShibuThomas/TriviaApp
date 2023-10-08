@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:text="Name here"
+            android:text="--"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
 
         <TextView
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:text="Score: 10000000000"
+            android:text="Score: --"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <Button

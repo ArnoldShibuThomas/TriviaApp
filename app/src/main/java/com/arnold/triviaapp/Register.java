@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +37,8 @@ public class Register extends AppCompatActivity {
 
     EditText username;
 
+    LoadingDialog loadingDialog = new LoadingDialog(Register.this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +69,7 @@ public class Register extends AppCompatActivity {
     }
 
     private void createUser() {
+        // instantiate everything locally
         String emailReceived = email.getText().toString();
         String passwordReceived = password.getText().toString();
         String confirmPasswordReceived = confirmPassword.getText().toString();
@@ -92,6 +96,8 @@ public class Register extends AppCompatActivity {
             Toast.makeText(this, "Password needs to have 1 letter, 1 number and 1 special character", Toast.LENGTH_SHORT).show();
         }
         else{
+            // start loading
+            loadingDialog.startLoadingDialog();
             // create the user with that email and password
             firebaseAuth.createUserWithEmailAndPassword(emailReceived,passwordReceived).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
@@ -118,10 +124,26 @@ public class Register extends AppCompatActivity {
                                 }
                             }
                         });
+                        // create a delay
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingDialog.dismissDialog();
+                            }
+                        }, 600);
                         // bring user back to login
                         startActivity(new Intent(Register.this,Login.class));
                     }
                     else{
+                        // create a delay
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingDialog.dismissDialog();
+                            }
+                        }, 600);
                         // display the error
                         Toast.makeText(Register.this, "Registration Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }

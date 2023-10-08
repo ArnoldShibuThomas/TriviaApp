@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ public class ProfileFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase rootNode;
     private DatabaseReference reference;
+    private LoadingDialog loadingDialog = null;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -70,6 +72,9 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(loadingDialog == null) {
+            loadingDialog = new LoadingDialog(getActivity());
+        }
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -79,6 +84,11 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        if(loadingDialog == null) {
+            loadingDialog = new LoadingDialog(getActivity());
+        }
+        // start loading
+        loadingDialog.startLoadingDialog();
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         scoreHere = view.findViewById(R.id.scoreHere);
         usernameHere = view.findViewById(R.id.userNameDisplay);
@@ -115,6 +125,14 @@ public class ProfileFragment extends Fragment {
                 startActivity(new Intent(getActivity(),Login.class));
             }
         });
+        // create a delay
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadingDialog.dismissDialog();
+            }
+        }, 600);
         // Inflate the layout for this fragment
         return view;
     }

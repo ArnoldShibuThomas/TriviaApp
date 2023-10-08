@@ -1,5 +1,6 @@
 package com.arnold.triviaapp;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
@@ -17,7 +18,14 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.commons.codec.binary.Base64;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +53,9 @@ public class Questions extends AppCompatActivity {
     private String sessionKey;
     private GifImageView feedbackImage;
     private final LoadingDialog loadingDialog = new LoadingDialog(Questions.this);
+    private FirebaseAuth firebaseAuth;
+    private FirebaseDatabase rootNode;
+    private DatabaseReference reference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +83,7 @@ public class Questions extends AppCompatActivity {
         status = findViewById(R.id.statusMessage);
         nextQuestion = findViewById(R.id.nextQuestion);
         nextQuestion.setVisibility(View.INVISIBLE);
+        firebaseAuth = FirebaseAuth.getInstance();
         // check for null
         if(categoryId != null){
             // get a question
@@ -134,6 +146,49 @@ public class Questions extends AppCompatActivity {
                     if(ended == false) {
                         // start loading
                         loadingDialog.startLoadingDialog();
+                        //updated user
+                        UserHelperClass helperClass = new UserHelperClass();
+                        // create a user score score
+                        helperClass.setScore(-1.0);
+                        // Get the current user's uid
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        String uid = user.getUid();
+                        // get firebase instance
+                        rootNode = FirebaseDatabase.getInstance();
+                        // get reference
+                        reference = rootNode.getReference(uid);
+                        reference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    UserHelperClass userhere = task.getResult().getValue(UserHelperClass.class);
+                                    // get the user name
+                                    helperClass.setUsername(userhere.getUsername());
+                                    // get the score
+                                    helperClass.setScore(userhere.getScore());
+                                    // update the score value
+                                    double score = helperClass.getScore() + Math.round(correctlyAnswered * 100.0) / 100.0;
+                                    // update score value
+                                    helperClass.setScore(score);
+                                    // update the value in firebase
+                                    reference.setValue(helperClass).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                Toast.makeText(Questions.this, "+ " + Math.round(correctlyAnswered * 100.0) / 100.0  + " points have been won!", Toast.LENGTH_SHORT).show();
+                                            }
+                                            else{
+                                                Toast.makeText(Questions.this, "Score error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                }
+                                else{
+                                    Toast.makeText(Questions.this, "No score deduction", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
                         // set every question thing to invisible
                         question.setVisibility(View.GONE);
                         b1.setVisibility(View.GONE);
