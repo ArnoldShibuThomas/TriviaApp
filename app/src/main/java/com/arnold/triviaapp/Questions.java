@@ -129,15 +129,6 @@ public class Questions extends AppCompatActivity {
                     b4.setBackgroundColor(Color.LTGRAY);
                     // get a question
                     getQuestion();
-                    // create a handler
-                    Handler handler = new Handler();
-                    // Delay
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            loadingDialog.dismissDialog();
-                        }
-                    }, 500);
                 }
                 else{
                     if(ended == false) {
@@ -178,15 +169,6 @@ public class Questions extends AppCompatActivity {
                 }
             }
         });
-        // create a handler
-        Handler handler = new Handler();
-        // Delay
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadingDialog.dismissDialog();
-            }
-        }, 600);
     }
 
     private void getQuestion() {
@@ -262,6 +244,15 @@ public class Questions extends AppCompatActivity {
                         else{
                             Toast.makeText(this, "Session cannot be made", Toast.LENGTH_SHORT).show();
                         }
+                        // create a handler
+                        Handler handler = new Handler();
+                        // Delay
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingDialog.dismissDialog();
+                            }
+                        }, 600);
                     } catch (JSONException e) {
                         Toast.makeText(this, "It looks like the servers may be down try again", Toast.LENGTH_SHORT).show();
                     }

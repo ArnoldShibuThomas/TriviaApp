@@ -113,8 +113,6 @@ public class HomeFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, categoriesFound);
         // on below line we are setting adapter for our list view.
         categories.setAdapter(adapter);
-        // get all of the categories
-        getCategories(adapter);
         // create a Text-watcher on the search bard
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
@@ -147,6 +145,7 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+
         // make the refresh button look up categories again
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -181,14 +180,8 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        // create a delay
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadingDialog.dismissDialog();
-            }
-        }, 500);
+        // get all of the categories
+        getCategories(adapter);
         // Inflate the layout for this fragment
         return view;
     }
@@ -213,7 +206,6 @@ public class HomeFragment extends Fragment {
         String url = categoriesApi;
         // clear the list
         categoriesFound.clear();
-
         // since the response we get from the api is in JSON, we need to use `JsonObjectRequest` for parsing the request response
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 // when the HTTP request succeeds
@@ -241,6 +233,14 @@ public class HomeFragment extends Fragment {
                         }
                         // notify the adapter of the chane
                         adapter.notifyDataSetChanged();
+                        // create a delay
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingDialog.dismissDialog();
+                            }
+                        }, 600);
                     } catch (JSONException e) {
                         Toast.makeText(getActivity(), "It looks like the servers may be down try again", Toast.LENGTH_SHORT).show();
                     }

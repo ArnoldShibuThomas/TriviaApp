@@ -15,6 +15,12 @@
         android:theme="@style/Theme.TriviaApp"
         tools:targetApi="31">
         <activity
+            android:name=".Register"
+            android:exported="false" />
+        <activity
+            android:name=".Login"
+            android:exported="false" />
+        <activity
             android:name=".Questions"
             android:exported="false" />
         <activity
