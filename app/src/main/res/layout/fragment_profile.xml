@@ -11,9 +11,10 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <com.makeramen.roundedimageview.RoundedImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profilePic"
+            android:layout_width="216dp"
+            android:layout_height="177dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:src="@drawable/baseline_person_24" />
