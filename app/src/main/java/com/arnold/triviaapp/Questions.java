@@ -3,13 +3,11 @@ package com.arnold.triviaapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -314,8 +312,17 @@ public class Questions extends AppCompatActivity {
                 },
                 // when the HTTP request fails
                 (Response.ErrorListener) error -> {
-                    // make a Toast telling the user that something went wrong
-                    Toast.makeText(this, "Error Occurred during load", Toast.LENGTH_LONG).show();
+                    //request another question but pause
+
+                    // create a handler
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            //call getQuestion
+                            getQuestion();
+                        }
+                    }, 600);
                 }
         );
         // to the Volley request queue
