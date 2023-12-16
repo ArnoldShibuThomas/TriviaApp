@@ -11,9 +11,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.ClientError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -241,6 +243,7 @@ public class Questions extends AppCompatActivity {
                     try {
                         // get the response code
                         int code = (int) response.get("response_code");
+
                         // check if the code is zero
                         if(code == 0){
                             // get the JSON Object of the question
@@ -312,17 +315,22 @@ public class Questions extends AppCompatActivity {
                 },
                 // when the HTTP request fails
                 (Response.ErrorListener) error -> {
-                    //request another question but pause
-
-                    // create a handler
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            //call getQuestion
-                            getQuestion();
-                        }
-                    }, 600);
+                    //request another question since we need to wait before calling again
+                   if(error.networkResponse.statusCode == 429) {
+                       // create a handler
+                       Handler handler = new Handler();
+                       handler.postDelayed(new Runnable() {
+                           @Override
+                           public void run() {
+                               //call getQuestion
+                               getQuestion();
+                           }
+                       }, 600);
+                   }
+                   else{
+                       Toast.makeText(this, "Error getting question try again!", Toast.LENGTH_SHORT).show();
+                       finish();
+                   }
                 }
         );
         // to the Volley request queue
